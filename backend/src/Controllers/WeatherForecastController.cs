@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ReceiptKeeper.Entities;
 
 namespace ReceiptKeeper.Controllers;
 
