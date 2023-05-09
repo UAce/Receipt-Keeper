@@ -24,6 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _focusPassword = FocusNode();
 
   bool _isProcessing = false;
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                   ),
                                   TextFormField(
-                                    obscureText: true,
+                                    obscureText: !_isPasswordVisible,
                                     enableSuggestions: false,
                                     autocorrect: false,
                                     focusNode: _focusPassword,
@@ -145,11 +146,24 @@ class _RegisterPageState extends State<RegisterPage> {
                                       }
                                       return null;
                                     },
-                                    decoration: const InputDecoration(
-                                      border: UnderlineInputBorder(),
+                                    decoration: InputDecoration(
+                                      border: const UnderlineInputBorder(),
                                       labelText: 'Password',
                                       helperText:
                                           'Must be at least 8 characters',
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _isPasswordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _isPasswordVisible =
+                                                !_isPasswordVisible;
+                                          });
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ],

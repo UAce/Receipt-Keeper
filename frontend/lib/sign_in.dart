@@ -20,6 +20,7 @@ class _SignInPageState extends State<SignInPage> {
   final _focusPassword = FocusNode();
 
   bool _isProcessing = false;
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +108,22 @@ class _SignInPageState extends State<SignInPage> {
                                       }
                                       return null;
                                     },
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                       border: UnderlineInputBorder(),
                                       labelText: 'Password',
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _isPasswordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _isPasswordVisible =
+                                                !_isPasswordVisible;
+                                          });
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ],
