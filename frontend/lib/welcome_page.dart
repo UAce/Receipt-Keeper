@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:receipt_keeper/common/PillButton.dart';
+import 'package:receipt_keeper/common/TextWithLink.dart';
 import 'package:receipt_keeper/common/themes.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -41,51 +43,40 @@ class WelcomePage extends StatelessWidget {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            const Spacer(flex: 1),
             Expanded(
+                flex: 3,
                 child: Align(
-              alignment: Alignment.topCenter,
-              child: Column(children: [
-                Spacer(),
-                SvgPicture.asset('assets/images/get_started.svg')
-              ]),
-            )),
+                  alignment: Alignment.topCenter,
+                  child: Column(children: [
+                    const Spacer(),
+                    SvgPicture.asset('assets/images/get_started.svg')
+                  ]),
+                )),
             Expanded(
+              flex: 3,
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Column(children: [
                   Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-                      child: const Text(
-                        "Track your receipts anywhere",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 26),
-                      )),
-                  Spacer(),
-                  FilledButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/register');
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          const Color(0xFF7B55E0)),
-                      padding: MaterialStateProperty.all<EdgeInsets>(
-                          EdgeInsets.symmetric(horizontal: 80, vertical: 20)),
-                    ),
-                    child: const Text("Get Started",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 16)),
-                  ),
-                  TextButton(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 10),
+                      child: Text("Track your receipts anywhere",
+                          style: titleTextStyle)),
+                  const Spacer(),
+                  PillButton(
+                      buttonText: "Get Started",
                       onPressed: () {
-                        Navigator.pushNamed(context, '/signIn');
-                      },
-                      child: const Text("Sign in",
-                          style: TextStyle(
-                              color: primaryColor,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16))),
-                  Spacer(),
+                        Navigator.pushNamed(context, '/register');
+                      }),
+                  const SizedBox(height: 10),
+                  TextWithLink(
+                    linkText: "Sign in",
+                    onLinkTap: () {
+                      Navigator.pushNamed(context, '/signIn');
+                    },
+                  ),
+                  const Spacer(),
                 ]),
               ),
             )

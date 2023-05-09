@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:receipt_keeper/common/themes.dart';
+import 'package:receipt_keeper/register.dart';
+import 'package:receipt_keeper/sign_in.dart';
 
 import 'welcome_page.dart';
 
@@ -22,8 +24,8 @@ class MyApp extends StatelessWidget {
         initialRoute: initialRoute,
         routes: {
           '/welcome': (context) => const WelcomePage(title: 'Home'),
-          '/signIn': (context) => const Text("TODO: Create Sign In Page"),
-          '/register': (context) => const Text("TODO: Create Register Page"),
+          '/signIn': (context) => const SignInPage(),
+          '/register': (context) => const RegisterPage(),
         });
   }
 }
