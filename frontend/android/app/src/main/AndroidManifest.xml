@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.frontend">
+    package="dev.yueh.receiptKeeper">
    <application
         android:label="Receipt Keeper"
         android:name="${applicationName}"

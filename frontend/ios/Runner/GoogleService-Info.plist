@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>492137530634-2c9kjo9c7r74ruc8iilhal3aip8uj5o5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.492137530634-2c9kjo9c7r74ruc8iilhal3aip8uj5o5</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA4iiw3q7vxDQXuMvb72ae6q1pHqsADjhA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>492137530634</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>dev.yueh.receiptKeeper</string>
+	<key>PROJECT_ID</key>
+	<string>receipt-keeper-9abac</string>
+	<key>STORAGE_BUCKET</key>
+	<string>receipt-keeper-9abac.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:492137530634:ios:1fe079b8c2b233c0b3a6f3</string>
+</dict>
+</plist>

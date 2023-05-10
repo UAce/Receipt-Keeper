@@ -1,4 +1,4 @@
-package com.example.frontend
+package dev.yueh.receiptKeeper
 
 import io.flutter.embedding.android.FlutterActivity
 
