@@ -2,25 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:receipt_keeper/common/PillButton.dart';
 import 'package:receipt_keeper/common/TextWithLink.dart';
 import 'package:receipt_keeper/common/themes.dart';
+import 'package:receipt_keeper/services/firebase_service.dart';
+import 'package:receipt_keeper/services/navigation_service.dart';
+import 'package:receipt_keeper/services/service_locator.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  bool _isProcessing = false;
+  bool _isPasswordVisible = false;
+
+  final _authService = locator<FirebaseAuthService>();
   final _registerFormKey = GlobalKey<FormState>();
 
-  final _emailTextController = TextEditingController();
-  final _passwordTextController = TextEditingController();
-
+  // Field Focus Nodes
+  final _focusFirstName = FocusNode();
+  final _focusLastName = FocusNode();
   final _focusEmail = FocusNode();
   final _focusPassword = FocusNode();
 
-  bool _isProcessing = false;
-  bool _isPasswordVisible = false;
+  // Field Text Controllers
+  final _firstNameTextController = TextEditingController();
+  final _lastNameTextController = TextEditingController();
+  final _emailTextController = TextEditingController();
+  final _passwordTextController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Start listening to changes.
+    // _firstNameTextController.addListener();
+    // _lastNameTextController.addListener();
+    // _emailTextController.addListener();
+    // _passwordTextController.addListener();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the widget tree.
+    _firstNameTextController.dispose();
+    _lastNameTextController.dispose();
+    _emailTextController.dispose();
+    _passwordTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +59,34 @@ class _SignInPageState extends State<SignInPage> {
 
     Future<void> onSubmit() async {
       setState(() => _isProcessing = true);
+      print("Submitting form...");
       Future.delayed(
-        const Duration(seconds: 2),
+        const Duration(seconds: 1),
         () => setState(() => _isProcessing = false),
       );
+
+      try {
+        await _authService.register(
+          email: _emailTextController.text,
+          password: _passwordTextController.text,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Account creation succeeded!"),
+            duration: Duration(seconds: 1)));
+        locator<NavigationService>().navigateToReplacement("/home");
+      } catch (e) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Something went wrong. Please try again."),
+        ));
+        return;
+      }
     }
 
     return GestureDetector(
         onTap: () {
+          _focusFirstName.unfocus();
+          _focusLastName.unfocus();
           _focusEmail.unfocus();
           _focusPassword.unfocus();
         },
@@ -50,13 +100,13 @@ class _SignInPageState extends State<SignInPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text("Sign in", style: titleTextStyle),
+                          Text("Sign up", style: titleTextStyle),
                           Padding(
                             padding: const EdgeInsets.only(
                               top: 15,
                               bottom: 40,
                             ),
-                            child: Text("Welcome to receipt keeper",
+                            child: Text("Create an account to get started",
                                 style: subtitleTextStyle),
                           ),
                         ],
@@ -72,6 +122,7 @@ class _SignInPageState extends State<SignInPage> {
                       height: deviceHeight - topSectionHeight,
                       child: Form(
                         key: _registerFormKey,
+                        autovalidateMode: AutovalidateMode.disabled,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -81,7 +132,42 @@ class _SignInPageState extends State<SignInPage> {
                               child: Column(
                                 children: [
                                   TextFormField(
+                                    focusNode: _focusFirstName,
+                                    controller: _firstNameTextController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your first name';
+                                      }
+                                      if (value.length < 2) {
+                                        return 'Must be at least 2 characters';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: const InputDecoration(
+                                      border: UnderlineInputBorder(),
+                                      labelText: 'First name',
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    focusNode: _focusLastName,
+                                    controller: _lastNameTextController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your last name';
+                                      }
+                                      if (value.length < 2) {
+                                        return 'Must be at least 2 characters';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: const InputDecoration(
+                                      border: UnderlineInputBorder(),
+                                      labelText: 'Last name',
+                                    ),
+                                  ),
+                                  TextFormField(
                                     focusNode: _focusEmail,
+                                    controller: _emailTextController,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your email';
@@ -95,10 +181,11 @@ class _SignInPageState extends State<SignInPage> {
                                     ),
                                   ),
                                   TextFormField(
-                                    obscureText: true,
+                                    focusNode: _focusPassword,
+                                    controller: _passwordTextController,
+                                    obscureText: !_isPasswordVisible,
                                     enableSuggestions: false,
                                     autocorrect: false,
-                                    focusNode: _focusPassword,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your password';
@@ -109,8 +196,10 @@ class _SignInPageState extends State<SignInPage> {
                                       return null;
                                     },
                                     decoration: InputDecoration(
-                                      border: UnderlineInputBorder(),
+                                      border: const UnderlineInputBorder(),
                                       labelText: 'Password',
+                                      helperText:
+                                          'Must be at least 8 characters',
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _isPasswordVisible
@@ -130,7 +219,7 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                             ),
                             PillButton(
-                                buttonText: "Sign in",
+                                buttonText: "Sign up",
                                 isLoading: _isProcessing,
                                 onPressed: () async {
                                   if (_registerFormKey.currentState!
@@ -139,10 +228,10 @@ class _SignInPageState extends State<SignInPage> {
                                   }
                                 }),
                             TextWithLink(
-                                plainText: "Don't have an account?",
-                                linkText: "Sign up",
+                                plainText: "Already have an account?",
+                                linkText: "Sign in",
                                 onLinkTap: () =>
-                                    Navigator.pushNamed(context, '/register'))
+                                    Navigator.pushNamed(context, '/login'))
                           ],
                         ),
                       ))

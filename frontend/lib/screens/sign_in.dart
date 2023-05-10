@@ -2,29 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:receipt_keeper/common/PillButton.dart';
 import 'package:receipt_keeper/common/TextWithLink.dart';
 import 'package:receipt_keeper/common/themes.dart';
+import 'package:receipt_keeper/services/firebase_service.dart';
+import 'package:receipt_keeper/services/navigation_service.dart';
+import 'package:receipt_keeper/services/service_locator.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _LoginPageState extends State<LoginPage> {
+  bool _isProcessing = false;
+  bool _isPasswordVisible = false;
+
+  final _authService = locator<FirebaseAuthService>();
   final _registerFormKey = GlobalKey<FormState>();
 
-  final _firstNameTextController = TextEditingController();
-  final _lastNameTextController = TextEditingController();
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
 
-  final _focusFirstName = FocusNode();
-  final _focusLastName = FocusNode();
   final _focusEmail = FocusNode();
   final _focusPassword = FocusNode();
 
-  bool _isProcessing = false;
-  bool _isPasswordVisible = false;
+  @override
+  void initState() {
+    super.initState();
+    // Start listening to changes.
+    // _emailTextController.addListener();
+    // _passwordTextController.addListener();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the widget tree.
+    _emailTextController.dispose();
+    _passwordTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +49,31 @@ class _RegisterPageState extends State<RegisterPage> {
 
     Future<void> onSubmit() async {
       setState(() => _isProcessing = true);
+      print("Submitting login form...");
       Future.delayed(
-        const Duration(seconds: 2),
+        const Duration(seconds: 1),
         () => setState(() => _isProcessing = false),
       );
+
+      try {
+        await _authService.login(
+          email: _emailTextController.text,
+          password: _passwordTextController.text,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Login succeeded!"), duration: Duration(seconds: 1)));
+        locator<NavigationService>().navigateToReplacement("/home");
+      } catch (e) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Invalid username or password"),
+        ));
+        return;
+      }
     }
 
     return GestureDetector(
         onTap: () {
-          _focusFirstName.unfocus();
-          _focusLastName.unfocus();
           _focusEmail.unfocus();
           _focusPassword.unfocus();
         },
@@ -56,13 +87,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text("Sign up", style: titleTextStyle),
+                          Text("Sign in", style: titleTextStyle),
                           Padding(
                             padding: const EdgeInsets.only(
                               top: 15,
                               bottom: 40,
                             ),
-                            child: Text("Create an account to get started",
+                            child: Text("Welcome to receipt keeper",
                                 style: subtitleTextStyle),
                           ),
                         ],
@@ -87,39 +118,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               child: Column(
                                 children: [
                                   TextFormField(
-                                    focusNode: _focusFirstName,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your first name';
-                                      }
-                                      if (value.length < 2) {
-                                        return 'Must be at least 2 characters';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: const InputDecoration(
-                                      border: UnderlineInputBorder(),
-                                      labelText: 'First name',
-                                    ),
-                                  ),
-                                  TextFormField(
-                                    focusNode: _focusLastName,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your last name';
-                                      }
-                                      if (value.length < 2) {
-                                        return 'Must be at least 2 characters';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: const InputDecoration(
-                                      border: UnderlineInputBorder(),
-                                      labelText: 'Last name',
-                                    ),
-                                  ),
-                                  TextFormField(
                                     focusNode: _focusEmail,
+                                    controller: _emailTextController,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your email';
@@ -133,10 +133,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                   ),
                                   TextFormField(
-                                    obscureText: !_isPasswordVisible,
+                                    focusNode: _focusPassword,
+                                    controller: _passwordTextController,
+                                    obscureText: true,
                                     enableSuggestions: false,
                                     autocorrect: false,
-                                    focusNode: _focusPassword,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your password';
@@ -147,10 +148,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                       return null;
                                     },
                                     decoration: InputDecoration(
-                                      border: const UnderlineInputBorder(),
+                                      border: UnderlineInputBorder(),
                                       labelText: 'Password',
-                                      helperText:
-                                          'Must be at least 8 characters',
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _isPasswordVisible
@@ -170,7 +169,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             PillButton(
-                                buttonText: "Sign up",
+                                buttonText: "Sign in",
                                 isLoading: _isProcessing,
                                 onPressed: () async {
                                   if (_registerFormKey.currentState!
@@ -179,10 +178,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                   }
                                 }),
                             TextWithLink(
-                                plainText: "Already have an account?",
-                                linkText: "Sign in",
+                                plainText: "Don't have an account?",
+                                linkText: "Sign up",
                                 onLinkTap: () =>
-                                    Navigator.pushNamed(context, '/signIn'))
+                                    Navigator.pushNamed(context, '/register'))
                           ],
                         ),
                       ))

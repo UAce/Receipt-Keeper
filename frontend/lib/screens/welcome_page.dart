@@ -73,7 +73,7 @@ class WelcomePage extends StatelessWidget {
                   TextWithLink(
                     linkText: "Sign in",
                     onLinkTap: () {
-                      Navigator.pushNamed(context, '/signIn');
+                      Navigator.pushNamed(context, '/login');
                     },
                   ),
                   const Spacer(),
