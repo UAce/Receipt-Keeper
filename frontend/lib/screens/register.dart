@@ -3,7 +3,6 @@ import 'package:receipt_keeper/common/PillButton.dart';
 import 'package:receipt_keeper/common/TextWithLink.dart';
 import 'package:receipt_keeper/common/themes.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';
-import 'package:receipt_keeper/services/navigation_service.dart';
 import 'package:receipt_keeper/services/service_locator.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -16,6 +15,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool _isProcessing = false;
   bool _isPasswordVisible = false;
+  bool _autoValidateForm = false;
 
   final _authService = locator<FirebaseAuthService>();
   final _registerFormKey = GlobalKey<FormState>();
@@ -33,16 +33,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordTextController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    // Start listening to changes.
-    // _firstNameTextController.addListener();
-    // _lastNameTextController.addListener();
-    // _emailTextController.addListener();
-    // _passwordTextController.addListener();
-  }
-
-  @override
   void dispose() {
     // Clean up the controller when the widget is removed from the widget tree.
     _firstNameTextController.dispose();
@@ -58,28 +48,32 @@ class _RegisterPageState extends State<RegisterPage> {
     double topSectionHeight = 200.0;
 
     Future<void> onSubmit() async {
-      setState(() => _isProcessing = true);
-      print("Submitting form...");
-      Future.delayed(
-        const Duration(seconds: 1),
-        () => setState(() => _isProcessing = false),
-      );
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      if (_registerFormKey.currentState!.validate()) {
+        setState(() => _isProcessing = true);
 
-      try {
-        await _authService.register(
-          email: _emailTextController.text,
-          password: _passwordTextController.text,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Account creation succeeded!"),
-            duration: Duration(seconds: 1)));
-        locator<NavigationService>().navigateToReplacement("/home");
-      } catch (e) {
-        print(e);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Something went wrong. Please try again."),
-        ));
-        return;
+        try {
+          await _authService.register(
+            email: _emailTextController.text,
+            password: _passwordTextController.text,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Successfully created account!"),
+              backgroundColor: successColor,
+              duration: Duration(seconds: 2)));
+        } catch (e) {
+          print(e);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Something went wrong. Please try again."),
+            backgroundColor: errorColor,
+            duration: Duration(days: 365), // hack to make snackbar persist
+          ));
+          return;
+        } finally {
+          setState(() => _isProcessing = false);
+        }
+      } else {
+        setState(() => _autoValidateForm = true);
       }
     }
 
@@ -122,7 +116,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: deviceHeight - topSectionHeight,
                       child: Form(
                         key: _registerFormKey,
-                        autovalidateMode: AutovalidateMode.disabled,
+                        autovalidateMode: _autoValidateForm
+                            ? AutovalidateMode.onUserInteraction
+                            : AutovalidateMode.disabled,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -134,6 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   TextFormField(
                                     focusNode: _focusFirstName,
                                     controller: _firstNameTextController,
+                                    textInputAction: TextInputAction.next,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your first name';
@@ -151,6 +148,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   TextFormField(
                                     focusNode: _focusLastName,
                                     controller: _lastNameTextController,
+                                    textInputAction: TextInputAction.next,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your last name';
@@ -168,6 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   TextFormField(
                                     focusNode: _focusEmail,
                                     controller: _emailTextController,
+                                    textInputAction: TextInputAction.next,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your email';
@@ -183,9 +182,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                   TextFormField(
                                     focusNode: _focusPassword,
                                     controller: _passwordTextController,
+                                    textInputAction: TextInputAction.done,
                                     obscureText: !_isPasswordVisible,
                                     enableSuggestions: false,
                                     autocorrect: false,
+                                    // onFieldSubmitted expects a synchronous function
+                                    // so I cannot call onSubmit() with await
+                                    onFieldSubmitted: (value) => onSubmit(),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your password';
@@ -221,12 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             PillButton(
                                 buttonText: "Sign up",
                                 isLoading: _isProcessing,
-                                onPressed: () async {
-                                  if (_registerFormKey.currentState!
-                                      .validate()) {
-                                    await onSubmit();
-                                  }
-                                }),
+                                onPressed: () async => await onSubmit()),
                             TextWithLink(
                                 plainText: "Already have an account?",
                                 linkText: "Sign in",

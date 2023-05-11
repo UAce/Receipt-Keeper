@@ -3,7 +3,6 @@ import 'package:receipt_keeper/common/PillButton.dart';
 import 'package:receipt_keeper/common/TextWithLink.dart';
 import 'package:receipt_keeper/common/themes.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';
-import 'package:receipt_keeper/services/navigation_service.dart';
 import 'package:receipt_keeper/services/service_locator.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,23 +15,18 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isProcessing = false;
   bool _isPasswordVisible = false;
+  bool _autoValidateForm = false;
+  bool _loginError = false;
 
   final _authService = locator<FirebaseAuthService>();
-  final _registerFormKey = GlobalKey<FormState>();
+  final _loginFormKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
 
   final _focusEmail = FocusNode();
   final _focusPassword = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    // Start listening to changes.
-    // _emailTextController.addListener();
-    // _passwordTextController.addListener();
-  }
 
   @override
   void dispose() {
@@ -48,27 +42,34 @@ class _LoginPageState extends State<LoginPage> {
     double topSectionHeight = 200.0;
 
     Future<void> onSubmit() async {
-      setState(() => _isProcessing = true);
-      print("Submitting login form...");
-      Future.delayed(
-        const Duration(seconds: 1),
-        () => setState(() => _isProcessing = false),
-      );
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      if (_loginFormKey.currentState!.validate()) {
+        setState(() => _isProcessing = true);
 
-      try {
-        await _authService.login(
-          email: _emailTextController.text,
-          password: _passwordTextController.text,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Login succeeded!"), duration: Duration(seconds: 1)));
-        locator<NavigationService>().navigateToReplacement("/home");
-      } catch (e) {
-        print(e);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Invalid username or password"),
-        ));
-        return;
+        try {
+          await _authService.login(
+            email: _emailTextController.text,
+            password: _passwordTextController.text,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Successfully logged in!"),
+              backgroundColor: successColor,
+              duration: Duration(seconds: 2)));
+        } catch (e) {
+          if (!_loginError) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Invalid username or password"),
+              backgroundColor: errorColor,
+              duration: Duration(days: 365), // hack to make snackbar persist
+            ));
+          }
+          setState(() => _loginError = true);
+          print(e);
+        } finally {
+          setState(() => _isProcessing = false);
+        }
+      } else {
+        setState(() => _autoValidateForm = true);
       }
     }
 
@@ -108,7 +109,10 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       height: deviceHeight - topSectionHeight,
                       child: Form(
-                        key: _registerFormKey,
+                        key: _loginFormKey,
+                        autovalidateMode: _autoValidateForm
+                            ? AutovalidateMode.onUserInteraction
+                            : AutovalidateMode.disabled,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -120,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                                   TextFormField(
                                     focusNode: _focusEmail,
                                     controller: _emailTextController,
+                                    textInputAction: TextInputAction.next,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your email';
@@ -128,16 +133,19 @@ class _LoginPageState extends State<LoginPage> {
                                       return null;
                                     },
                                     decoration: const InputDecoration(
-                                      border: UnderlineInputBorder(),
                                       labelText: 'Email',
                                     ),
                                   ),
                                   TextFormField(
                                     focusNode: _focusPassword,
                                     controller: _passwordTextController,
+                                    textInputAction: TextInputAction.done,
                                     obscureText: true,
                                     enableSuggestions: false,
                                     autocorrect: false,
+                                    // onFieldSubmitted expects a synchronous function
+                                    // so I cannot call onSubmit() with await
+                                    onFieldSubmitted: (value) => onSubmit(),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your password';
@@ -148,7 +156,6 @@ class _LoginPageState extends State<LoginPage> {
                                       return null;
                                     },
                                     decoration: InputDecoration(
-                                      border: UnderlineInputBorder(),
                                       labelText: 'Password',
                                       suffixIcon: IconButton(
                                         icon: Icon(
@@ -171,12 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                             PillButton(
                                 buttonText: "Sign in",
                                 isLoading: _isProcessing,
-                                onPressed: () async {
-                                  if (_registerFormKey.currentState!
-                                      .validate()) {
-                                    await onSubmit();
-                                  }
-                                }),
+                                onPressed: () async => await onSubmit()),
                             TextWithLink(
                                 plainText: "Don't have an account?",
                                 linkText: "Sign up",

@@ -12,20 +12,21 @@ class FirebaseAuthService {
   final FirebaseAuth _auth;
 
   // Authentication Methods
-  // On error: Something went wrong, please try again later
-  Future<void> register({required String email, required String password}) {
-    return _auth.createUserWithEmailAndPassword(
+  Future<void> register(
+      {required String email, required String password}) async {
+    await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
+    validateLoginState();
   }
 
-  // On error: Wrong email or password
-  Future<void> login({required String email, required String password}) {
-    return _auth.signInWithEmailAndPassword(
+  Future<void> login({required String email, required String password}) async {
+    await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+    validateLoginState();
   }
 
   Future<void> logOut() => _auth.signOut();
@@ -38,10 +39,10 @@ class FirebaseAuthService {
     final user = getCurrentUser();
     if (user == null) {
       print('ValidateLoginState: User is currently signed out!');
-      locator<NavigationService>().navigateTo("/login");
+      locator<NavigationService>().navigateToReplacement("/login");
     } else {
       print('ValidateLoginState: User is currently signed in!');
-      locator<NavigationService>().navigateTo("/home");
+      locator<NavigationService>().navigateToReplacement("/home");
     }
   }
 
@@ -49,10 +50,10 @@ class FirebaseAuthService {
     _auth.authStateChanges().listen((User? user) {
       if (user == null) {
         print('listenToLoginState: User is signed out!');
-        locator<NavigationService>().navigateTo("/login");
+        locator<NavigationService>().navigateToReplacement("/login");
       } else {
         print('listenToLoginState: User is signed in!');
-        locator<NavigationService>().navigateTo("/home");
+        locator<NavigationService>().navigateToReplacement("/home");
       }
     });
   }

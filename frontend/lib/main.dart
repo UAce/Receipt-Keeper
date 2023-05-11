@@ -23,7 +23,10 @@ void main() async {
   locator
       .registerLazySingleton(() => FirebaseAuthService(FirebaseAuth.instance));
 
-  runApp(const MyApp(initialRoute: '/welcome'));
+  final authService = locator<FirebaseAuthService>();
+  User? user = authService.getCurrentUser();
+
+  runApp(MyApp(initialRoute: user == null ? '/welcome' : '/home'));
 }
 
 class MyApp extends StatelessWidget {
@@ -34,9 +37,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final authService = locator<FirebaseAuthService>();
-    authService.validateLoginState();
-
     return MaterialApp(
       title: 'Receipt Keeper',
       theme: baseTheme,
