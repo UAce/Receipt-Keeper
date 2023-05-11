@@ -13,6 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String token = "";
+
   @override
   initState() {
     super.initState();
@@ -20,13 +22,19 @@ class _HomePageState extends State<HomePage> {
 
     User? user = authService.getCurrentUser();
     if (user != null) {
-      user.getIdToken().then((value) => print("Auth Token ID: $value"));
+      user.getIdTokenResult().then((value) {
+        print("Token Result: $value");
+        setState(() {
+          token = value.token!;
+        });
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authService = locator<FirebaseAuthService>();
+    final user = authService.getCurrentUser();
     print("Current User: ${authService.getCurrentUser()}");
 
     return Scaffold(
@@ -35,15 +43,40 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
       ),
       body: Center(
-        child: PillButton(
-            buttonText: "Log out",
-            onPressed: () async {
-              await authService.logOut();
-              locator<NavigationService>().navigateTo('/login');
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Successfully logged out!"),
-                  duration: Duration(seconds: 2)));
-            }),
+        child: Column(
+          children: [
+            const SizedBox(height: 100),
+            TextField(
+              enabled: false,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Email',
+              ),
+              controller: TextEditingController(
+                  text: user != null ? user.email : "No user logged in"),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              enabled: false,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Token',
+              ),
+              controller:
+                  TextEditingController(text: token ?? "No user logged in"),
+            ),
+            const SizedBox(height: 20),
+            PillButton(
+                buttonText: "Log out",
+                onPressed: () async {
+                  await authService.logOut();
+                  locator<NavigationService>().navigateTo('/login');
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Successfully logged out!"),
+                      duration: Duration(seconds: 2)));
+                }),
+          ],
+        ),
       ),
     );
   }
