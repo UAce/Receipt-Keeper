@@ -5,6 +5,6 @@ namespace Core.Interfaces;
 
 public interface IUserRepository
 {
-    public Task RegisterAsync(UserRegistrationModel userRegistrationModel);
-
+    public Task<UserModel> RegisterAsync(UserRegistrationModel userRegistrationModel);
+    public Task<UserModel?> GetUserAsync(string externalId);
 }

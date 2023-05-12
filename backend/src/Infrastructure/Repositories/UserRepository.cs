@@ -16,11 +16,41 @@ public class UserRepository : IUserRepository
     {
         _config = config;
     }
-    
-    public async Task RegisterAsync(UserRegistrationModel userRegistrationModel)
+
+    public async Task<UserModel> RegisterAsync(UserRegistrationModel userRegistrationModel)
     {
         await using var connection = new NpgsqlConnection(_config.GetConnectionString("DefaultConnection"));
-        // TODO: Create User
-        var users = await connection.QueryAsync<UserEntity>("SELECT * FROM management.\"User\"");
+        var user = await connection.QueryFirstAsync<UserEntity>(
+            "INSERT INTO management.\"User\" (\"FirstName\", \"LastName\", \"Email\", \"ExternalId\") VALUES (@FirstName, @LastName, @Email, @ExternalId) RETURNING *",
+            new {FirstName = userRegistrationModel.FirstName, LastName = userRegistrationModel.LastName, Email = userRegistrationModel.Email, ExternalId = userRegistrationModel.ExternalId});
+
+        return new UserModel
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email
+        };
+    }
+
+    public async Task<UserModel?> GetUserAsync(string externalId)
+    {
+        try
+        {
+            await using var connection = new NpgsqlConnection(_config.GetConnectionString("DefaultConnection"));
+            var user = await connection.QuerySingleOrDefaultAsync<UserEntity>("SELECT * FROM management.\"User\" where \"ExternalId\" = @ExternalId", new {ExternalId = externalId});
+            return user != null ? new UserModel
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email
+            } : null;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"UserRepository: Failed to get user with externalId: '{externalId}'. Error: $e");
+            throw;
+        }
     }
 }

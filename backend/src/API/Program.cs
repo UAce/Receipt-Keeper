@@ -1,3 +1,7 @@
+using Core;
+using Core.Interfaces;
+using Infrastructure.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -26,6 +30,10 @@ builder.Services
             RequireSignedTokens = true,
         };
     });
+
+// Configure dependency injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddMediatR(typeof(MediatorEntrypoint).Assembly);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

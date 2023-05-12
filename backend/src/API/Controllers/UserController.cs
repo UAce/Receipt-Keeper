@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.DTOs.User;
+using Core.Models.User;
+using Core.Queries.User;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +17,13 @@ namespace API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly IMediator _mediator;
+
+        public UserController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+        
         // GET: api/User
         [HttpGet]
         public IEnumerable<string> Get()
@@ -22,16 +32,22 @@ namespace API.Controllers
         }
 
         // GET: api/User/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        [HttpGet("{externalId}", Name = "Get")]
+        public async Task<UserModel> Get(string externalId)
         {
-            return "value";
+            Console.WriteLine($"Retrieving User by externalId: '{externalId}'");
+            var user = await _mediator.Send(new GetUserQuery(externalId));
+            if (user == null)
+            {
+                Response.StatusCode = 404;
+            }
+            return user;
         }
 
         [HttpPost ("Register")]
         public string Register([FromBody] UserRegistrationDto userRegistrationDto)
         {
-            Console.WriteLine(userRegistrationDto.Email);
+            Console.WriteLine($"Registering User: ${userRegistrationDto.Email}");
             // TODO: Call Mediatr to register user
             return "value";
         }
