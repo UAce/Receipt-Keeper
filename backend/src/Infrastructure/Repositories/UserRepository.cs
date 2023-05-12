@@ -21,7 +21,7 @@ public class UserRepository : IUserRepository
     {
         await using var connection = new NpgsqlConnection(_config.GetConnectionString("DefaultConnection"));
         var user = await connection.QueryFirstAsync<UserEntity>(
-            "INSERT INTO management.\"User\" (\"FirstName\", \"LastName\", \"Email\", \"ExternalId\") VALUES (@FirstName, @LastName, @Email, @ExternalId) RETURNING *",
+            "INSERT INTO management.\"User\" (\"id\", \"FirstName\", \"LastName\", \"Email\", \"ExternalId\") VALUES (gen_random_uuid(), @FirstName, @LastName, @Email, @ExternalId) RETURNING *",
             new {FirstName = userRegistrationModel.FirstName, LastName = userRegistrationModel.LastName, Email = userRegistrationModel.Email, ExternalId = userRegistrationModel.ExternalId});
 
         return new UserModel

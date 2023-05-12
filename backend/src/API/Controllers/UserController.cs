@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.DTOs.User;
+using Core.Commands.User;
 using Core.Models.User;
 using Core.Queries.User;
 using MediatR;
@@ -33,23 +34,22 @@ namespace API.Controllers
 
         // GET: api/User/5
         [HttpGet("{externalId}", Name = "Get")]
-        public async Task<UserModel> Get(string externalId)
+        public async Task<UserModel?> Get(string externalId)
         {
             Console.WriteLine($"Retrieving User by externalId: '{externalId}'");
-            var user = await _mediator.Send(new GetUserQuery(externalId));
-            if (user == null)
+            var userModel = await _mediator.Send(new GetUserQuery(externalId));
+            if (userModel == null)
             {
                 Response.StatusCode = 404;
             }
-            return user;
+            return userModel;
         }
 
         [HttpPost ("Register")]
-        public string Register([FromBody] UserRegistrationDto userRegistrationDto)
+        public async Task<UserModel> Register([FromBody] UserRegistrationDto userRegistrationDto)
         {
             Console.WriteLine($"Registering User: ${userRegistrationDto.Email}");
-            // TODO: Call Mediatr to register user
-            return "value";
+            return await _mediator.Send(new RegisterUserCommand(userRegistrationDto.FirstName, userRegistrationDto.LastName, userRegistrationDto.Email, userRegistrationDto.ExternalId));
         }
 
         // PUT: api/User/5

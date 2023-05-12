@@ -31,14 +31,14 @@ builder.Services
         };
     });
 
-// Configure dependency injection
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddMediatR(typeof(MediatorEntrypoint).Assembly);
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Configure dependency injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddMediatR(typeof(MediatorEntrypoint).Assembly);
 
 var app = builder.Build();
 
