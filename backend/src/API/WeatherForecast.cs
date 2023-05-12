@@ -1,4 +1,4 @@
-namespace ReceiptKeeper.Entities;
+namespace API;
 
 public class WeatherForecast
 {

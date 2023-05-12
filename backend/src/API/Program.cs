@@ -1,7 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-const string firebaseProjectId = "ProjectId";
+// Temporary solution to get the firebase projectId
+IConfiguration configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+    .Build();
+var firebaseProjectId = configuration["Firebase:projectId"];
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

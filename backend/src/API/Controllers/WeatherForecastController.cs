@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using ReceiptKeeper.Entities;
 
-namespace ReceiptKeeper.Controllers;
+namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -22,7 +21,6 @@ public class WeatherForecastController : ControllerBase
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
-        _logger.LogInformation("Hello");
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
