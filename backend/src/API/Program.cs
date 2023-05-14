@@ -1,20 +1,49 @@
+using System.Reflection;
 using Core;
 using Core.Interfaces;
+using DbUp;
 using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-// Temporary solution to get the firebase projectId
+// Temporary solution to get the Configs
 IConfiguration configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
     .Build();
-var firebaseProjectId = configuration["Firebase:projectId"];
+
+var upgradeEngine = DeployChanges.To.PostgresqlDatabase(configuration.GetConnectionString("DefaultConnection"))
+    .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+    .LogToConsole()
+    .Build();
+
+upgradeEngine.GetScriptsToExecute();
+
+if (upgradeEngine.IsUpgradeRequired())
+{
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("Running migration...");
+    var result = upgradeEngine.PerformUpgrade();
+
+    if (!result.Successful)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(result.Error);
+        Console.ResetColor();
+        System.Environment.Exit(1);
+    }
+    
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(value: "Migration Successfully Ran!");
+    Console.ResetColor();
+    System.Environment.Exit(0);
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var firebaseProjectId = configuration["Firebase:projectId"];
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
