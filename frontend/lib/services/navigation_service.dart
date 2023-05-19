@@ -24,4 +24,16 @@ class NavigationService {
       return Future.value(null);
     }
   }
+
+  void goBack(BuildContext context) {
+    NavigatorState? state = navigatorKey.currentState;
+    if (state != null) {
+      state.maybePop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Oh no... Please try again later."),
+          duration: Duration(seconds: 4)));
+      return;
+    }
+  }
 }

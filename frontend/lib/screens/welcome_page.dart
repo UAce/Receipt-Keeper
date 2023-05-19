@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:receipt_keeper/common/PillButton.dart';
-import 'package:receipt_keeper/common/TextWithLink.dart';
+import 'package:receipt_keeper/common/pill_button.dart';
+import 'package:receipt_keeper/common/text_with_link.dart';
 import 'package:receipt_keeper/common/themes.dart';
 
 class WelcomePage extends StatelessWidget {

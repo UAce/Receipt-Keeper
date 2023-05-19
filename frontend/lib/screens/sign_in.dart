@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:receipt_keeper/common/PillButton.dart';
-import 'package:receipt_keeper/common/TextWithLink.dart';
+import 'package:receipt_keeper/common/pill_button.dart';
+import 'package:receipt_keeper/common/text_with_link.dart';
 import 'package:receipt_keeper/common/themes.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';
-import 'package:receipt_keeper/services/service_locator.dart';
+import 'package:receipt_keeper/services/service_locator_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:receipt_keeper/services/navigation_service.dart';
-import 'package:receipt_keeper/services/service_locator.dart';
+import 'package:receipt_keeper/services/service_locator_service.dart';
 
 // TODO: Make this a singleton
 //  Firebase Authentication SDK wrapper service
@@ -12,21 +12,31 @@ class FirebaseAuthService {
   final FirebaseAuth _auth;
 
   // Authentication Methods
-  Future<void> register(
+  Future<User> register(
       {required String email, required String password}) async {
     await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    validateLoginState();
+
+    User? newUser = _auth.currentUser;
+    if (newUser == null) {
+      throw Exception("Failed to register new user. User is null");
+    }
+    return newUser;
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<User> login({required String email, required String password}) async {
     await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
-    validateLoginState();
+
+    User? loggedInUser = _auth.currentUser;
+    if (loggedInUser == null) {
+      throw Exception("Failed to log in user. User is null");
+    }
+    return loggedInUser;
   }
 
   Future<void> logOut() => _auth.signOut();
@@ -36,7 +46,7 @@ class FirebaseAuthService {
 
   // Custom Methods
   validateLoginState() {
-    final user = getCurrentUser();
+    final user = _auth.currentUser;
     if (user == null) {
       print('ValidateLoginState: User is currently signed out!');
       locator<NavigationService>().navigateToReplacement("/login");
@@ -60,5 +70,9 @@ class FirebaseAuthService {
 
   User? getCurrentUser() {
     return _auth.currentUser;
+  }
+
+  Future<String> getAuthToken() {
+    return _auth.currentUser!.getIdToken();
   }
 }

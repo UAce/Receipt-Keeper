@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:receipt_keeper/common/PillButton.dart';
-import 'package:receipt_keeper/common/TextWithLink.dart';
+import 'package:receipt_keeper/common/pill_button.dart';
+import 'package:receipt_keeper/common/text_with_link.dart';
 import 'package:receipt_keeper/common/themes.dart';
+import 'package:receipt_keeper/models/registered_user.dart';
+import 'package:receipt_keeper/services/api/user_api_service.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';
-import 'package:receipt_keeper/services/service_locator.dart';
+import 'package:receipt_keeper/services/service_locator_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -16,6 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isProcessing = false;
   bool _isPasswordVisible = false;
   bool _autoValidateForm = false;
+  UserApiService userApiService = UserApiService();
 
   final _authService = locator<FirebaseAuthService>();
   final _registerFormKey = GlobalKey<FormState>();
@@ -53,10 +57,20 @@ class _RegisterPageState extends State<RegisterPage> {
         setState(() => _isProcessing = true);
 
         try {
-          await _authService.register(
+          User authUser = await _authService.register(
             email: _emailTextController.text,
             password: _passwordTextController.text,
           );
+
+          RegisteredUser newUser = await userApiService.register(
+            _firstNameTextController.text,
+            _lastNameTextController.text,
+            _emailTextController.text,
+            authUser.uid,
+          );
+
+          await authUser.updateDisplayName(newUser.fullName);
+          await _authService.validateLoginState();
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Successfully created account!"),
               backgroundColor: successColor,

@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:receipt_keeper/common/PillButton.dart';
+import 'package:receipt_keeper/common/pill_button.dart';
+import 'package:receipt_keeper/models/registered_user.dart';
+import 'package:receipt_keeper/services/api/user_api_service.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';
+import 'package:receipt_keeper/services/logging_service.dart';
 import 'package:receipt_keeper/services/navigation_service.dart';
-import 'package:receipt_keeper/services/service_locator.dart';
+import 'package:receipt_keeper/services/service_locator_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,29 +17,35 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String token = "";
+  UserApiService userApiService = UserApiService();
+  RegisteredUser? user;
+  late FirebaseAuthService authService;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    final authService = locator<FirebaseAuthService>();
+    getUser();
+  }
 
-    User? user = authService.getCurrentUser();
-    if (user != null) {
-      user.getIdTokenResult().then((value) {
-        print("Token Result: $value");
-        setState(() {
-          token = value.token!;
-        });
+  Future<void> getUser() async {
+    authService = locator<FirebaseAuthService>();
+    // Get auth user
+    User? authUser = authService.getCurrentUser();
+    if (authUser != null) {
+      LoggingService.getLogger('Home')
+          .info("Current User: ${authUser.toString()}");
+      IdTokenResult value = await authUser.getIdTokenResult();
+      setState(() {
+        token = value.token!;
       });
+      user = await userApiService.getByExternalId(authUser.uid);
+    } else {
+      locator<NavigationService>().navigateTo('/error');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authService = locator<FirebaseAuthService>();
-    final user = authService.getCurrentUser();
-    print("Current User: ${authService.getCurrentUser()}");
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
@@ -53,17 +62,26 @@ class _HomePageState extends State<HomePage> {
                 labelText: 'Email',
               ),
               controller: TextEditingController(
-                  text: user != null ? user.email : "No user logged in"),
+                  text: user?.email ?? "No user logged in"),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+            TextField(
+              enabled: false,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Full Name',
+              ),
+              controller: TextEditingController(
+                  text: user?.fullName ?? "No user logged in"),
+            ),
+            const SizedBox(height: 20),
             TextField(
               enabled: false,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Token',
               ),
-              controller:
-                  TextEditingController(text: token ?? "No user logged in"),
+              controller: TextEditingController(text: token),
             ),
             const SizedBox(height: 20),
             PillButton(
@@ -74,6 +92,21 @@ class _HomePageState extends State<HomePage> {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Successfully logged out!"),
                       duration: Duration(seconds: 2)));
+                }),
+            const SizedBox(height: 20),
+            PillButton(
+                buttonText: "Get user",
+                onPressed: () async {
+                  await getUser();
+                  if (user != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Successfully got user!"),
+                        duration: Duration(seconds: 2)));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Failed to get user!"),
+                        duration: Duration(seconds: 2)));
+                  }
                 }),
           ],
         ),

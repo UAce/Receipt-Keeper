@@ -31,10 +31,10 @@
               "client_type": 3
             },
             {
-              "client_id": "492137530634-2c9kjo9c7r74ruc8iilhal3aip8uj5o5.apps.googleusercontent.com",
+              "client_id": "492137530634-1lobt5ii63tm1ejp7ri0lstk6hbrtco9.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.frontend"
+                "bundle_id": "dev.yueh.receiptKeeper"
               }
             }
           ]
