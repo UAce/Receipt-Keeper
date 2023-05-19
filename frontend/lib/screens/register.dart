@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:receipt_keeper/common/pill_button.dart';
-import 'package:receipt_keeper/common/text_with_link.dart';
+import 'package:receipt_keeper/common/widgets/pill_button.dart';
 import 'package:receipt_keeper/common/themes.dart';
+import 'package:receipt_keeper/common/widgets/text_with_link.dart';
 import 'package:receipt_keeper/models/registered_user.dart';
 import 'package:receipt_keeper/services/api/user_api_service.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:receipt_keeper/common/pill_button.dart';
+import 'package:receipt_keeper/common/widgets/pill_button.dart';
 import 'package:receipt_keeper/common/themes.dart';
 import 'package:receipt_keeper/services/navigation_service.dart';
 import 'package:receipt_keeper/services/service_locator_service.dart';

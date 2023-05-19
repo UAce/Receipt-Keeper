@@ -24,20 +24,20 @@ import 'screens/welcome_page.dart';
 void main() async {
   LoggingService.getLogger('Main').info('Starting app in [$environment]');
 
-  // Fix certificate issue in development
-  if (environment == 'production') {
-    FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  } else {
-    HttpOverrides.global = DevelopmentHttpOverrides();
-    // FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-  }
-
   // Log errors caught by Zones
   runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // Fix certificate issue in development
+    if (environment == 'production') {
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    } else {
+      HttpOverrides.global = DevelopmentHttpOverrides();
+      // FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+    }
 
     // Pass all uncaught "fatal" errors from the framework to Crashlytics
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;

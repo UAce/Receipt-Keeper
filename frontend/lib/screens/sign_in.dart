@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:receipt_keeper/common/pill_button.dart';
-import 'package:receipt_keeper/common/text_with_link.dart';
 import 'package:receipt_keeper/common/themes.dart';
+import 'package:receipt_keeper/common/widgets/pill_button.dart';
+import 'package:receipt_keeper/common/widgets/text_with_link.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';
 import 'package:receipt_keeper/services/service_locator_service.dart';
 
@@ -51,6 +51,7 @@ class _LoginPageState extends State<LoginPage> {
             email: _emailTextController.text,
             password: _passwordTextController.text,
           );
+          _authService.validateLoginState();
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Successfully logged in!"),
               backgroundColor: successColor,
@@ -140,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                                     focusNode: _focusPassword,
                                     controller: _passwordTextController,
                                     textInputAction: TextInputAction.done,
-                                    obscureText: true,
+                                    obscureText: !_isPasswordVisible,
                                     enableSuggestions: false,
                                     autocorrect: false,
                                     // onFieldSubmitted expects a synchronous function

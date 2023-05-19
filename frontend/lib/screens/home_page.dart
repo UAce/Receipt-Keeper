@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:receipt_keeper/common/pill_button.dart';
+import 'package:receipt_keeper/common/widgets/pill_button.dart';
 import 'package:receipt_keeper/models/registered_user.dart';
 import 'package:receipt_keeper/services/api/user_api_service.dart';
 import 'package:receipt_keeper/services/firebase_service.dart';
@@ -16,10 +16,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // States
   String token = "";
-  UserApiService userApiService = UserApiService();
   RegisteredUser? user;
-  late FirebaseAuthService authService;
+
+  // Services
+  UserApiService userApiService = UserApiService();
+  late FirebaseAuthService authService = locator<FirebaseAuthService>();
 
   @override
   void initState() {
@@ -28,7 +31,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> getUser() async {
-    authService = locator<FirebaseAuthService>();
+    // setState(() => user = null);
+    // Give the impression that something is happening
+    await Future.delayed(const Duration(seconds: 1));
+
     // Get auth user
     User? authUser = authService.getCurrentUser();
     if (authUser != null) {
@@ -38,7 +44,9 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         token = value.token!;
       });
-      user = await userApiService.getByExternalId(authUser.uid);
+      RegisteredUser loggedUser =
+          await userApiService.getByExternalId(authUser.uid);
+      setState(() => user = loggedUser);
     } else {
       locator<NavigationService>().navigateTo('/error');
     }
@@ -54,7 +62,7 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: Column(
           children: [
-            const SizedBox(height: 100),
+            const SizedBox(height: 150),
             TextField(
               enabled: false,
               decoration: const InputDecoration(
@@ -74,16 +82,7 @@ class _HomePageState extends State<HomePage> {
               controller: TextEditingController(
                   text: user?.fullName ?? "No user logged in"),
             ),
-            const SizedBox(height: 20),
-            TextField(
-              enabled: false,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Token',
-              ),
-              controller: TextEditingController(text: token),
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
             PillButton(
                 buttonText: "Log out",
                 onPressed: () async {
