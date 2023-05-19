@@ -11,15 +11,25 @@ namespace Infrastructure.Repositories;
 public class UserRepository : IUserRepository
 {
     private readonly IConfiguration _config;
+    private readonly string? _connectionString;
 
     public UserRepository(IConfiguration config)
     {
         _config = config;
+        _connectionString = _config.GetConnectionString("DefaultConnection");
+        Console.WriteLine(_connectionString);
+        if (_connectionString == null){
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                .Build();
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
+        }
     }
 
     public async Task<UserModel> RegisterAsync(UserRegistrationModel userRegistrationModel)
     {
-        await using var connection = new NpgsqlConnection(_config.GetConnectionString("DefaultConnection"));
+        await using var connection = new NpgsqlConnection(_connectionString);
         var user = await connection.QueryFirstAsync<UserEntity>(
             "INSERT INTO management.\"User\" (\"Id\", \"FirstName\", \"LastName\", \"Email\", \"ExternalId\") VALUES (gen_random_uuid(), @FirstName, @LastName, @Email, @ExternalId) RETURNING *",
             new {FirstName = userRegistrationModel.FirstName, LastName = userRegistrationModel.LastName, Email = userRegistrationModel.Email, ExternalId = userRegistrationModel.ExternalId});
@@ -37,7 +47,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            await using var connection = new NpgsqlConnection(_config.GetConnectionString("DefaultConnection"));
+            await using var connection = new NpgsqlConnection(_connectionString);
             var user = await connection.QuerySingleOrDefaultAsync<UserEntity>("SELECT * FROM management.\"User\" where \"ExternalId\" = @ExternalId", new {ExternalId = externalId});
             return user != null ? new UserModel
             {

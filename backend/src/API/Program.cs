@@ -13,6 +13,8 @@ IConfiguration configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
     .Build();
 
+Console.WriteLine(configuration);
+Console.WriteLine(configuration.GetConnectionString("DefaultConnection"));
 var upgradeEngine = DeployChanges.To.PostgresqlDatabase(configuration.GetConnectionString("DefaultConnection"))
     .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
     .LogToConsole()
