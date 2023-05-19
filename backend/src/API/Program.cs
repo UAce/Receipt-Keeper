@@ -42,6 +42,9 @@ if (upgradeEngine.IsUpgradeRequired())
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure JSON logging to the console
+// builder.Logging.AddJsonConsole();
+
 // Add services to the container.
 var firebaseProjectId = configuration["Firebase:projectId"];
 builder.Services
@@ -78,7 +81,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Commenting this out because it was causing the app to be unreachable in Production
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

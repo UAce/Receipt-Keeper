@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS "management";
+
 CREATE TABLE IF NOT EXISTS "management"."User"
 (
     "Id"         uuid         NOT NULL DEFAULT gen_random_uuid(),

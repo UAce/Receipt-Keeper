@@ -9,7 +9,6 @@ services:
     ports:
       - '5444:5432'
     volumes:
-      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pgdatabase:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: 'rk-dev-db'

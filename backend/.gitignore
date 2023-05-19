@@ -265,4 +265,7 @@ paket-files/
 __pycache__/
 *.pyc
 
+# misc
 appsettings.Development.json
+build.sh
+docker-compose.yml
