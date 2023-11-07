@@ -5,6 +5,7 @@ using DbUp;
 using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 
 // Temporary solution to get the Configs
@@ -13,8 +14,9 @@ IConfiguration configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
     .Build();
 
-Console.WriteLine(configuration);
-Console.WriteLine(configuration.GetConnectionString("DefaultConnection"));
+// Console.WriteLine(configuration);
+// Console.WriteLine(configuration.GetConnectionString("DefaultConnection"));
+
 var upgradeEngine = DeployChanges.To.PostgresqlDatabase(configuration.GetConnectionString("DefaultConnection"))
     .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
     .LogToConsole()
@@ -44,6 +46,9 @@ if (upgradeEngine.IsUpgradeRequired())
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Inject configuration as singleton
+builder.Services.AddSingleton(configuration);
+    
 // Configure JSON logging to the console
 // builder.Logging.AddJsonConsole();
 
@@ -82,6 +87,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Forward headers from proxy servers
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // Commenting this out because it was causing the app to be unreachable in Production
 // app.UseHttpsRedirection();
