@@ -17,14 +17,14 @@ public class UserRepository : IUserRepository
     {
         _config = config;
         _connectionString = _config.GetConnectionString("DefaultConnection");
-        Console.WriteLine(_connectionString);
-        if (_connectionString == null){
-            IConfiguration configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
-                .Build();
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
-        }
+        // Console.WriteLine(_connectionString);
+        // if (_connectionString == null){
+        //     IConfiguration configuration = new ConfigurationBuilder()
+        //         .AddJsonFile("appsettings.json")
+        //         .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+        //         .Build();
+        //     _connectionString = configuration.GetConnectionString("DefaultConnection");
+        // }
     }
 
     public async Task<UserModel> RegisterAsync(UserRegistrationModel userRegistrationModel)

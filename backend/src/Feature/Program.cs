@@ -41,7 +41,6 @@ if (upgradeEngine.IsUpgradeRequired())
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine(value: "Migration Successfully Ran!");
     Console.ResetColor();
-    Environment.Exit(0);
 }
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
 # Install the PostgreSQL client
 RUN apt-get update \
@@ -15,4 +15,4 @@ COPY app /app
 EXPOSE 5001
 
 # Start the application
-#ENTRYPOINT ["dotnet", "app/net6.0/Feature.dll"]
+#ENTRYPOINT ["dotnet", "app/net8.0/Feature.dll"]
