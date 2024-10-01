@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using API.DTOs.User;
+using Feature.DTOs.User;
 using Core.Commands.User;
 using Core.Models.User;
 using Core.Queries.User;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace Feature.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

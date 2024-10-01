@@ -1,4 +1,4 @@
-namespace API;
+namespace Feature;
 
 public class WeatherForecast
 {

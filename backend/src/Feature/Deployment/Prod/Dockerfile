@@ -15,4 +15,4 @@ COPY app /app
 EXPOSE 5001
 
 # Start the application
-#ENTRYPOINT ["dotnet", "app/net6.0/API.dll"]
+#ENTRYPOINT ["dotnet", "app/net6.0/Feature.dll"]
