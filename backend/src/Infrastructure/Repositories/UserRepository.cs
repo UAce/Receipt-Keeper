@@ -31,8 +31,8 @@ public class UserRepository : IUserRepository
     {
         await using var connection = new NpgsqlConnection(_connectionString);
         var user = await connection.QueryFirstAsync<UserEntity>(
-            "INSERT INTO management.\"User\" (\"Id\", \"FirstName\", \"LastName\", \"Email\", \"ExternalId\") VALUES (gen_random_uuid(), @FirstName, @LastName, @Email, @ExternalId) RETURNING *",
-            new {FirstName = userRegistrationModel.FirstName, LastName = userRegistrationModel.LastName, Email = userRegistrationModel.Email, ExternalId = userRegistrationModel.ExternalId});
+            "INSERT INTO \"User\" (\"Id\", \"FirstName\", \"LastName\", \"Email\", \"ExternalId\") VALUES (gen_random_uuid(), @FirstName, @LastName, @Email, @ExternalId) RETURNING *",
+            new { userRegistrationModel.FirstName, userRegistrationModel.LastName, userRegistrationModel.Email, userRegistrationModel.ExternalId });
 
         return new UserModel
         {
@@ -48,7 +48,7 @@ public class UserRepository : IUserRepository
         try
         {
             await using var connection = new NpgsqlConnection(_connectionString);
-            var user = await connection.QuerySingleOrDefaultAsync<UserEntity>("SELECT * FROM management.\"User\" where \"ExternalId\" = @ExternalId", new {ExternalId = externalId});
+            var user = await connection.QuerySingleOrDefaultAsync<UserEntity>("SELECT * FROM \"User\" where \"ExternalId\" = @ExternalId", new {ExternalId = externalId});
             return user != null ? new UserModel
             {
                 Id = user.Id,
@@ -59,7 +59,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine($"UserRepository: Failed to get user with externalId: '{externalId}'. Error: $e");
+            Console.WriteLine($"UserRepository: Failed to get user with externalId: '{externalId}'. Error: {e}");
             throw;
         }
     }
