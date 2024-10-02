@@ -1,5 +1,6 @@
 using System.Reflection;
 using DbUp;
+using DbUp.Helpers;
 
 namespace Features.Migrations;
 
@@ -25,6 +26,7 @@ public static class DatabaseMigration
                 var upgradeEngine = DeployChanges.To
                     .PostgresqlDatabase(dbConnectionString)
                     .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                    .JournalTo(new NullJournal()) // This allows always running the migrations
                     .LogToConsole()
                     .Build();
 

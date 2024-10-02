@@ -2,56 +2,46 @@ using Features.Endpoints;
 using Domain.Models;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
 
 namespace Features.Users;
 
 public static class RegisterUser {
 
-  public record RegisterUserRequest(string FirstName, string LastName, string Email, string IdentityId);
-  public record RegisterUserResponse(Guid Id, string FirstName, string LastName, string Email, string IdentityId);
+  public record RegisterUserRequest(string FirstName, string LastName, string Email);
+  public record RegisterUserResponse(Guid Id, string FirstName, string LastName, string Email);
 
   public class Endpoint : IEndpoint
   {
       public void Map(IEndpointRouteBuilder app)
       {
-        app.MapPost("/user/register", Handler).WithTags("Users").WithName("RegisterUser").Produces<RegisterUserResponse>(201)
-        .AddEndpointFilter(async (context, next) => {
-          var userRequest = context.GetArgument<RegisterUserRequest>(0);
-          var identityId = userRequest.IdentityId;
-
-          // Validate that the identityId we are trying to register matches the claims
-          var identities = context.HttpContext.User.Identities;
-          var authenticatedIdentity = identities.FirstOrDefault((identity)=> identity.HasClaim((claim) => claim.Type == ClaimTypes.NameIdentifier && claim.Value == identityId));
-
-          if (authenticatedIdentity == null)
-          {
-            Console.WriteLine("Unauthorized: User cannot register another user");
-            return Results.Unauthorized();
-          }
-
-          return await next(context);
-        });
+        app.MapPost("/user/register", Handler).WithTags("Users").WithName("RegisterUser").Produces<RegisterUserResponse>(201);
       }
   }
 
   [Authorize]
-  public static async Task<IResult> Handler(RegisterUserRequest request, IUserRepository userRepository)
+  public static async Task<IResult> Handler(HttpContext context, RegisterUserRequest request, IUserRepository userRepository)
   {
     Console.WriteLine("Registering user...");
 
-    User user = new()
+    // Obtain the IdentityId from the authenticated user
+    var identities = context.User.Identities;
+    var identityId = identities.FirstOrDefault()?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+    if (identityId == null)
     {
+      Console.WriteLine("Unauthorized: User is not authenticated");
+      return Results.Unauthorized();
+    }
+
+    User registeredUser = await userRepository.RegisterAsync(new User {
       FirstName = request.FirstName,
       LastName = request.LastName,
       Email = request.Email,
-      IdentityId = request.IdentityId
-    };
-
-    User registeredUser = await userRepository.RegisterAsync(user);
+      IdentityId = identityId
+    });
     
-    return Results.Ok(new RegisterUserResponse(registeredUser.Id, registeredUser.FirstName, registeredUser.LastName, registeredUser.Email, registeredUser.IdentityId));
+    return Results.Ok(new RegisterUserResponse(registeredUser.Id, registeredUser.FirstName, registeredUser.LastName, registeredUser.Email));
   }
 
 }

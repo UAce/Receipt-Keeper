@@ -1,16 +1,21 @@
 @Features_HostAddress = http://localhost:5103
-# @token = 123
+@token = eyJhbGciOiJSUzI1NiIsImtpZCI6IjZjYzNmY2I2NDAzMjc2MGVlYjljMjZmNzdkNDA3YTY5NGM1MmIwZTMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcmVjZWlwdC1rZWVwZXItOWFiYWMiLCJhdWQiOiJyZWNlaXB0LWtlZXBlci05YWJhYyIsImF1dGhfdGltZSI6MTcyNzkwMjc3OCwidXNlcl9pZCI6IkYzZjNGVFR2SkJPZzRuaG9SN3lrZ29JejBVcTIiLCJzdWIiOiJGM2YzRlRUdkpCT2c0bmhvUjd5a2dvSXowVXEyIiwiaWF0IjoxNzI3OTAyNzc4LCJleHAiOjE3Mjc5MDYzNzgsImVtYWlsIjoieXV5dWVoLmxpdSt0ZXN0QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJ5dXl1ZWgubGl1K3Rlc3RAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.mk4cmPXAfpq7AMZIXzkgVG5MV9XciA56Ls5lk7F1YjRP9pntRCxL4lwJgvLgx8PBPiGPl6C-XBhWTNC5zJDo2l1cvkwe3bxfQUccnEBWyQ_P7nOmo2b0chfFwZ1ANUQuI5bQyCRsVJkeTPBXcyHN66rXIo0ZTKV85k_F_dR35ZsVc3UKvnYxFmPlN2mFYIyOtpLocMREaBPJ9jv2-F-tNNcV4DjzB5UAhDjjRodPU5IuC0x88DFhk6bkZglh-UE0lxW0AiBMhwGVR9Y38-z8Mlk62pNam4i-EGHTqGMRVbZVFKAIeHR8y1AJRXVK-9qcujHfe-HBNWmvQCEgTDRwsQ
 
 POST {{Features_HostAddress}}/user/register
-# Authorization: Bearer {{token}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
 
 {
     "FirstName":"UA",
     "LastName": "Liu",
-    "Email": "yuyueh.liu+1@gmail.com",
-    "IdentityId": "abc12345"
+    "Email": "yuyueh.liu+1@gmail.com"
 }
+
+###
+
+GET {{Features_HostAddress}}/user
+Authorization: Bearer {{token}}
+Accept: application/json
 
 ###
