@@ -12,7 +12,7 @@ WORKDIR /app
 COPY app /app
 
 # Expose the port
-EXPOSE 5001
+EXPOSE 5103
 
 # Start the application
-#ENTRYPOINT ["dotnet", "app/net8.0/Feature.dll"]
+#ENTRYPOINT ["dotnet", "app/net8.0/Features.dll"]
