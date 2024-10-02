@@ -2,7 +2,7 @@ using System.Reflection;
 using DbUp;
 using DbUp.Helpers;
 
-namespace Features.Migrations;
+namespace Application.Migrations;
 
 public static class DatabaseMigration
 {

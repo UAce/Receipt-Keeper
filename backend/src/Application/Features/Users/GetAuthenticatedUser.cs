@@ -1,10 +1,10 @@
-using Features.Endpoints;
+using Application.Endpoints;
 using Domain.Models;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
-namespace Features.Users;
+namespace Application.Features.Users;
 
 public static class GetAuthenticatedUser {
 

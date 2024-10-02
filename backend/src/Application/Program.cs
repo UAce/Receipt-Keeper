@@ -1,5 +1,5 @@
-using Features;
-using Features.Migrations;
+using Application;
+using Application.Migrations;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 

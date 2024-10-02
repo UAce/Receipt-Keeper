@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using Domain.Interfaces;
-using Features.Endpoints;
+using Application.Endpoints;
 using FirebaseAdmin.Auth;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
-namespace Features;
+namespace Application;
 
 public static class DependencyInjectionExtensions
 {
