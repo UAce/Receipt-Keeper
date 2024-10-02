@@ -1,0 +1,16 @@
+@Features_HostAddress = http://localhost:5103
+# @token = 123
+
+POST {{Features_HostAddress}}/user/register
+# Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "FirstName":"UA",
+    "LastName": "Liu",
+    "Email": "yuyueh.liu+1@gmail.com",
+    "ExternalId": "abc12345"
+}
+
+###
