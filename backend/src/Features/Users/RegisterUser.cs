@@ -9,8 +9,8 @@ namespace Features.Users;
 
 public static class RegisterUser {
 
-  public record RegisterUserRequest(string FirstName, string LastName, string Email, string ExternalId);
-  public record RegisterUserResponse(Guid Id, string FirstName, string LastName, string Email, string ExternalId);
+  public record RegisterUserRequest(string FirstName, string LastName, string Email, string IdentityId);
+  public record RegisterUserResponse(Guid Id, string FirstName, string LastName, string Email, string IdentityId);
 
   public class Endpoint : IEndpoint
   {
@@ -19,11 +19,11 @@ public static class RegisterUser {
         app.MapPost("/user/register", Handler).WithTags("Users").WithName("RegisterUser").Produces<RegisterUserResponse>(201)
         .AddEndpointFilter(async (context, next) => {
           var userRequest = context.GetArgument<RegisterUserRequest>(0);
-          var externalId = userRequest.ExternalId;
+          var identityId = userRequest.IdentityId;
 
-          // Validate that the externalId we are trying to register matches the claims
+          // Validate that the identityId we are trying to register matches the claims
           var identities = context.HttpContext.User.Identities;
-          var authenticatedIdentity = identities.FirstOrDefault((identity)=> identity.HasClaim((claim) => claim.Type == ClaimTypes.NameIdentifier && claim.Value == externalId));
+          var authenticatedIdentity = identities.FirstOrDefault((identity)=> identity.HasClaim((claim) => claim.Type == ClaimTypes.NameIdentifier && claim.Value == identityId));
 
           if (authenticatedIdentity == null)
           {
@@ -46,12 +46,12 @@ public static class RegisterUser {
       FirstName = request.FirstName,
       LastName = request.LastName,
       Email = request.Email,
-      ExternalId = request.ExternalId
+      IdentityId = request.IdentityId
     };
 
     User registeredUser = await userRepository.RegisterAsync(user);
     
-    return Results.Ok(new RegisterUserResponse(registeredUser.Id, registeredUser.FirstName, registeredUser.LastName, registeredUser.Email, registeredUser.ExternalId));
+    return Results.Ok(new RegisterUserResponse(registeredUser.Id, registeredUser.FirstName, registeredUser.LastName, registeredUser.Email, registeredUser.IdentityId));
   }
 
 }

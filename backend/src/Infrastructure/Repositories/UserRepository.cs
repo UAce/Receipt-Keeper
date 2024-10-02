@@ -7,20 +7,20 @@ namespace Infrastructure.Repositories;
 
 public class UserRepository(IDbConnection dbConnection) : BaseRepository(dbConnection), IUserRepository
 {
-    public async Task<User?> GetUserAsync(string externalId)
+    public async Task<User?> GetUserAsync(string identityId)
     {
         const string query = @"
-            SELECT * FROM ""User"" where ""ExternalId"" = @ExternalId
+            SELECT * FROM ""User"" where ""IdentityId"" = @IdentityId
         ";
 
-        return await _dbConnection.QuerySingleOrDefaultAsync<User>(query, new {ExternalId = externalId});
+        return await _dbConnection.QuerySingleOrDefaultAsync<User>(query, new {IdentityId = identityId});
     }
 
     public async Task<User> RegisterAsync(User user)
     {
         const string query = @"
             INSERT INTO ""User"" (
-               ""Id"", ""FirstName"", ""LastName"", ""Email"", ""ExternalId""
+               ""Id"", ""FirstName"", ""LastName"", ""Email"", ""IdentityId""
             ) 
             VALUES 
                 (
@@ -28,7 +28,7 @@ public class UserRepository(IDbConnection dbConnection) : BaseRepository(dbConne
                     @FirstName, 
                     @LastName, 
                     @Email, 
-                    @ExternalId
+                    @IdentityId
                 ) RETURNING *
         ";
         
@@ -36,7 +36,7 @@ public class UserRepository(IDbConnection dbConnection) : BaseRepository(dbConne
         // open, close and dispose the connection for you.
         return await _dbConnection.QueryFirstAsync<User>(
             query,
-            new { user.FirstName, user.LastName, user.Email, user.ExternalId });
+            new { user.FirstName, user.LastName, user.Email, user.IdentityId });
 
     }
 }

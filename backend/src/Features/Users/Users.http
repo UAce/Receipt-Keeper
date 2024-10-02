@@ -10,7 +10,7 @@ Accept: application/json
     "FirstName":"UA",
     "LastName": "Liu",
     "Email": "yuyueh.liu+1@gmail.com",
-    "ExternalId": "abc12345"
+    "IdentityId": "abc12345"
 }
 
 ###

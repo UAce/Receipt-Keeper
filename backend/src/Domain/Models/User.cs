@@ -10,7 +10,7 @@ public class User
 
     public required string Email { get; set; }
 
-    public required string ExternalId { get; set; }
+    public required string IdentityId { get; set; }
     
     public string FullName => $"{FirstName} {LastName}";
 }
