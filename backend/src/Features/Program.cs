@@ -1,8 +1,15 @@
 using Features;
 using Features.Migrations;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("firebase_admin_sdk.json"),
+});
+            
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -10,6 +17,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddEndpoints();
 builder.Services.AddRepositories();
 builder.Services.AddPersistences(builder);
+builder.Services.AddAuthentications(builder);
+builder.Services.AddAuthorizations();
 
 var app = builder.Build();
 
@@ -26,6 +35,10 @@ if (app.Environment.IsDevelopment())
 
 // Don't redirect to HTTPS, we'll be using a reverse proxy in production
 // app.UseHttpsRedirection();
+
+// This is required for the Firebase authentication scheme
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Health check endpoint
 app.MapGet("/health", () => "Ok!");

@@ -267,5 +267,6 @@ __pycache__/
 
 # misc
 appsettings.Development.json
+firebase_admin_sdk.json
 build.sh
 docker-compose.yml

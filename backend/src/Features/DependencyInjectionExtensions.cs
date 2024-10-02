@@ -1,16 +1,73 @@
+using System.Collections.Immutable;
 using System.Data;
 using System.Reflection;
+using System.Security.Claims;
+using System.Text;
 using Domain.Interfaces;
 using Features.Endpoints;
-using Infrastructure.Database;
+using FirebaseAdmin.Auth;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
 namespace Features;
 
 public static class DependencyInjectionExtensions
 {
+
+    public static IServiceCollection AddAuthorizations(this IServiceCollection services)
+    {
+        services.AddAuthorizationBuilder()
+            .SetDefaultPolicy(new AuthorizationPolicyBuilder()
+            .AddAuthenticationSchemes("Firebase")
+            .RequireAuthenticatedUser()
+            .Build());
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthentications(this IServiceCollection services, WebApplicationBuilder builder)
+    {
+        var configuration = builder.Configuration;
+        var firebaseProjectId = configuration["Firebase:projectId"];
+        services
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer("Firebase", options =>
+        {
+            options.Authority = $"https://securetoken.google.com/{firebaseProjectId}";
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidIssuer = $"https://securetoken.google.com/{firebaseProjectId}",
+                ValidAudience = $"{firebaseProjectId}",
+                RequireSignedTokens = true,
+                RequireExpirationTime = true,
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnForbidden = context =>
+                {
+                    Console.WriteLine("Forbidden: " + context.Request.Path);
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    // Log the exception or take any action you want
+                    Console.WriteLine("Authentication failed: " + context.Exception.Message);
+                    return Task.CompletedTask;
+                },
+            };
+        });
+
+        return services;
+    }
+
     public static IServiceCollection AddPersistences(this IServiceCollection services, WebApplicationBuilder builder)
     {
         string dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
