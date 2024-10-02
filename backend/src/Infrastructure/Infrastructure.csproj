@@ -18,11 +18,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Dapper" Version="2.0.123" />
+      <PackageReference Include="Dapper" Version="2.1.35" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0-preview.4.23259.5" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
-      <PackageReference Include="Npgsql" Version="8.0.0-preview.3" />
+      <PackageReference Include="Npgsql" Version="4.0.14" />
     </ItemGroup>
 
     <ItemGroup>

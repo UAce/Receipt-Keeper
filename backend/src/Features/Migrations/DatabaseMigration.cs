@@ -13,17 +13,17 @@ public static class DatabaseMigration
                 var configuration = services.GetRequiredService<IConfiguration>();
 
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("===== Migrating PostgreSQL database =====");
+                Console.WriteLine("===== Checking Database Migrations =====");
                 Console.ResetColor();
 
-                string connection = configuration.GetConnectionString("DefaultConnection") 
+                string dbConnectionString = configuration.GetConnectionString("DefaultConnection") 
                                      ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is null.");
 
                 // This prints out the connection string to the console
-                // EnsureDatabase.For.PostgresqlDatabase(connection);
+                // EnsureDatabase.For.PostgresqlDatabase(dbConnectionString);
 
                 var upgradeEngine = DeployChanges.To
-                    .PostgresqlDatabase(connection)
+                    .PostgresqlDatabase(dbConnectionString)
                     .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
                     .LogToConsole()
                     .Build();

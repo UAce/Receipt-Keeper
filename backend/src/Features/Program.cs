@@ -1,4 +1,4 @@
-using Features.Endpoints;
+using Features;
 using Features.Migrations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpoints();
+builder.Services.AddRepositories();
+builder.Services.AddPersistences(builder);
 
 var app = builder.Build();
 
