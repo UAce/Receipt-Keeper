@@ -1,6 +1,9 @@
-namespace Application.Endpoints;
-
-public interface IEndpoint
+namespace Application.Endpoints
 {
-    void Map(IEndpointRouteBuilder app);
+    public interface IEndpoint
+    {
+        public IEndpointRouteBuilder MapApiVersion(IEndpointRouteBuilder app);
+        public IEndpointRouteBuilder MapResource(IEndpointRouteBuilder app);
+        public void MapRoute(IEndpointRouteBuilder app);
+    }
 }
