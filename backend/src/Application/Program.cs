@@ -4,6 +4,7 @@ using Application.Migrations;
 using Application.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SupportNonNullableReferenceTypes();
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Receipt Keeper API v1" });
 });
 builder.Services.AddEndpoints();
 builder.Services.AddRepositories();
@@ -36,7 +38,10 @@ app.MigrateDatabase<Program>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.DocumentTitle = "Receipt Keeper API v1";
+    });
     Console.WriteLine("http://localhost:5103/swagger");
 }
 
@@ -48,7 +53,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Health check endpoint
-app.MapGet("/health", () => "Ok!");
+app.MapGet("/health", () => "Ok!").WithTags("Health Check");
 app.MapEndpoints();
 
 app.Run();
