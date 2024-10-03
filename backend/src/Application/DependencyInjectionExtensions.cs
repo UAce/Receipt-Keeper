@@ -1,8 +1,11 @@
 using System.Collections.Immutable;
 using System.Data;
 using System.Reflection;
+using System.Security.Claims;
 using Application.Endpoints;
 using Domain.Interfaces;
+using Domain.Models;
+using FluentValidation;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -68,6 +71,29 @@ public static class DependencyInjectionExtensions
                             );
                             return Task.CompletedTask;
                         },
+                        OnTokenValidated = async context =>
+                        {
+                            var userRepository =
+                                context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+
+                            var identityId = context
+                                .Principal?.FindFirst(ClaimTypes.NameIdentifier)
+                                ?.Value;
+
+                            Console.WriteLine("Retrieving CurrentUser");
+                            User? currentUser =
+                                identityId == null
+                                    ? null
+                                    : await userRepository.GetUserAsync(identityId);
+
+                            if (currentUser != null)
+                            {
+                                // This will be used in the HttpContextService
+                                context.HttpContext.Items["CurrentUser"] = currentUser;
+                            }
+
+                            return;
+                        },
                     };
                 }
             );
@@ -96,6 +122,36 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
+    }
+
+    public static void AddValidatorsFromAssembly(
+        this IServiceCollection services,
+        Assembly assembly
+    )
+    {
+        // Scan for all types in the specified assembly
+        var validatorTypes = assembly
+            .GetTypes()
+            .Where(t =>
+                t.IsClass
+                && !t.IsAbstract
+                && t.GetInterfaces()
+                    .Any(i =>
+                        i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>)
+                    )
+            );
+
+        foreach (var validatorType in validatorTypes)
+        {
+            // Register the validator as a transient service
+            var interfaceType = validatorType
+                .GetInterfaces()
+                .First(i =>
+                    i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>)
+                );
+
+            services.AddTransient(interfaceType, validatorType);
+        }
     }
 
     public static IServiceCollection AddEndpoints(this IServiceCollection services)

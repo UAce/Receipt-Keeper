@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Application.Endpoints;
+using Application.Services;
 using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -26,31 +27,23 @@ public static class GetAuthenticatedUser
     }
 
     [Authorize]
-    public static async Task<IResult> Handler(HttpContext context, IUserRepository userRepository)
+    public static IResult Handler(IHttpContextService userContextService)
     {
         Console.WriteLine("Get authenticated user");
 
-        // Obtain the IdentityId from the authenticated user
-        var identities = context.User.Identities;
-        var identityId = identities
-            .FirstOrDefault()
-            ?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
-            ?.Value;
-        User? authenticatedUser =
-            identityId == null ? null : await userRepository.GetUserAsync(identityId);
-
-        if (authenticatedUser == null)
+        User? currentUser = userContextService.CurrentUser;
+        if (currentUser == null)
         {
-            Console.WriteLine("NotFound: User has not been registered");
-            return Results.NotFound();
+            Console.WriteLine("Unauthorized: User is not authenticated");
+            return Results.Unauthorized();
         }
 
         return Results.Ok(
             new GetAuthenticatedUserResponse(
-                authenticatedUser.Id,
-                authenticatedUser.FirstName,
-                authenticatedUser.LastName,
-                authenticatedUser.Email
+                currentUser.Id,
+                currentUser.FirstName,
+                currentUser.LastName,
+                currentUser.Email
             )
         );
     }
