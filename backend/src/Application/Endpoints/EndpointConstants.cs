@@ -9,4 +9,6 @@ public static class EndpointConstants
     public const string Receipts = "/receipts";
 
     public const string Merchants = "/merchants";
+
+    public const string Currencies = "/currencies";
 }
