@@ -16,5 +16,7 @@ public class Receipt
 
     public required string CurrencyCode { get; set; }
 
+    public required Guid MerchantId { get; set; }
+
     public required Merchant Merchant { get; set; }
 }

@@ -32,10 +32,6 @@ public static class StoreReceipt
             RuleFor(x => x.Note)
                 .MaximumLength(255)
                 .WithMessage("Note cannot exceed 255 characters.");
-            RuleFor(x => x.MerchantId).NotEmpty().NotNull().WithMessage("Merchant ID is required.");
-            RuleFor(x => x.PrintedAt)
-                .NotEmpty()
-                .WithMessage("PrintedAt must be a valid DateTimeOffset.");
         }
     }
 

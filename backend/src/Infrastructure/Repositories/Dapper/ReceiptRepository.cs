@@ -15,9 +15,14 @@ public class ReceiptRepository(IDbConnection dbConnection)
     {
         const string query =
             @"
-                SELECT * FROM ""Receipt"" r 
-                INNER JOIN ""Merchant"" m ON r.""MerchantId"" = m.""Id"" 
-                WHERE ""Id"" = @Id
+                SELECT
+                    *
+                FROM
+                    ""Receipt"" r 
+                INNER JOIN
+                    ""Merchant"" m ON r.""MerchantId"" = m.""Id"" 
+                WHERE
+                    r.""Id"" = @Id
             ";
 
         var result = await _dbConnection.QueryAsync<ReceiptEntity, MerchantEntity, Receipt>(
@@ -32,6 +37,7 @@ public class ReceiptRepository(IDbConnection dbConnection)
                     PrintedAt = receipt.PrintedAt,
                     UserId = receipt.UserId,
                     CurrencyCode = receipt.CurrencyCode,
+                    MerchantId = merchant.Id,
                     Merchant = new Merchant { Id = merchant.Id, Name = merchant.Name },
                 };
             },
@@ -55,8 +61,7 @@ public class ReceiptRepository(IDbConnection dbConnection)
                 WHERE
                     r.""UserId"" = @UserId AND
                     (@FromDate IS NULL OR r.""PrintedAt"" >= @FromDate) AND
-                    -- Exclusive To
-                    (@ToDate IS NULL OR r.""PrintedAt"" < @ToDate)
+                    (@ToDate IS NULL OR r.""PrintedAt"" < @ToDate) -- Exclusive To
                 ORDER BY 
                     r.""PrintedAt""
                 OFFSET @Offset ROWS
@@ -96,13 +101,14 @@ public class ReceiptRepository(IDbConnection dbConnection)
         const string query =
             @"
             INSERT INTO ""Receipt"" (
-               ""Id"", ""Total"", ""Note"", ""CurrencyCode"", ""UserId"", ""MerchantId""
+               ""Id"", ""Total"", ""Note"", ""PrintedAt"", ""CurrencyCode"", ""UserId"", ""MerchantId""
             ) 
             VALUES 
                 (
                     gen_random_uuid(), 
                     @Total, 
                     @Note, 
+                    @PrintedAt,
                     @CurrencyCode, 
                     @UserId,
                     @MerchantId
@@ -115,8 +121,40 @@ public class ReceiptRepository(IDbConnection dbConnection)
             {
                 receipt.Total,
                 receipt.Note,
+                receipt.PrintedAt,
                 receipt.CurrencyCode,
                 receipt.UserId,
+                receipt.MerchantId,
+            }
+        );
+    }
+
+    public async Task<Receipt> EditReceiptAsync(EditReceiptRequest receipt)
+    {
+        const string query =
+            @"
+            UPDATE 
+                ""Receipt"" 
+            SET 
+                ""Total"" = @Total,
+                ""Note"" = @Note,
+                ""CurrencyCode"" = @CurrencyCode,
+                ""PrintedAt"" = @PrintedAt,
+                ""MerchantId"" = @MerchantId
+            WHERE
+                ""Id"" = @Id
+            RETURNING *;
+        ";
+
+        return await _dbConnection.QueryFirstAsync<Receipt>(
+            query,
+            new
+            {
+                receipt.Id,
+                receipt.Total,
+                receipt.Note,
+                receipt.PrintedAt,
+                receipt.CurrencyCode,
                 receipt.MerchantId,
             }
         );
