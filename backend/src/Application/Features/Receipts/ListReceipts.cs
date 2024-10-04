@@ -26,7 +26,7 @@ public static class ListReceipts
     {
         public void MapRoute(IEndpointRouteBuilder app)
         {
-            app.MapGet("/", Handler).WithName("ListReceipts").Produces<List<ReceiptListItem>>(201);
+            app.MapGet("/", Handler).WithName("ListReceipts").Produces<List<ReceiptListItem>>(200);
             ;
         }
     }

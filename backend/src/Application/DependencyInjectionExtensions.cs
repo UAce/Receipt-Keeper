@@ -121,6 +121,7 @@ public static class DependencyInjectionExtensions
     {
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IReceiptRepository, ReceiptRepository>();
+        services.AddScoped<IMerchantRepository, MerchantRepository>();
 
         return services;
     }
