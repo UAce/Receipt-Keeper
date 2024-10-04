@@ -4,7 +4,7 @@ namespace Application.Services
 {
     public interface IHttpContextService
     {
-        User CurrentUser { get; }
+        CurrentUser CurrentUser { get; }
         string IdentityId { get; }
     }
 }

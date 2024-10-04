@@ -1,5 +1,7 @@
 using System.Data;
 using Dapper;
+using Domain.DTOs;
+using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Models;
 
@@ -22,12 +24,12 @@ public class ReceiptRepository(IDbConnection dbConnection)
         );
     }
 
-    public Task<List<Receipt>> ListReceiptsAsync(ListReceiptsRequest request)
+    public Task<List<ReceiptListItem>> ListReceiptsAsync(ListReceiptsFilter filter)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Receipt> StoreReceiptAsync(Receipt receipt)
+    public async Task<Receipt> StoreReceiptAsync(ReceiptEntity receipt)
     {
         const string query =
             @"

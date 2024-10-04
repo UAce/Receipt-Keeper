@@ -1,12 +1,14 @@
+using Domain.DTOs;
+using Domain.Entities;
 using Domain.Models;
 
 namespace Domain.Interfaces;
 
 public interface IReceiptRepository
 {
-    public Task<Receipt> StoreReceiptAsync(Receipt receipt);
+    public Task<Receipt> StoreReceiptAsync(ReceiptEntity receipt);
 
     public Task<Receipt?> GetReceiptAsync(Guid receiptId);
 
-    public Task<List<Receipt>> ListReceiptsAsync(ListReceiptsRequest request);
+    public Task<List<ReceiptListItem>> ListReceiptsAsync(ListReceiptsFilter filter);
 }

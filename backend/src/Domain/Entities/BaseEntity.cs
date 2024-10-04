@@ -1,6 +1,6 @@
-namespace Domain.Models;
+namespace Domain.Entities;
 
-public class Base
+public class BaseEntity
 {
     public Guid Id { get; set; }
 

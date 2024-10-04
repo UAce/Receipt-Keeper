@@ -1,5 +1,6 @@
 using Application.Endpoints;
 using Application.Services;
+using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Models;
 using FluentValidation;
@@ -69,7 +70,7 @@ public static class StoreReceipt
         }
 
         Receipt newReceipt = await receiptRepository.StoreReceiptAsync(
-            new Receipt
+            new ReceiptEntity
             {
                 Total = request.Total,
                 Note = request.Note,
@@ -85,7 +86,7 @@ public static class StoreReceipt
             {
                 newReceipt.Id,
                 newReceipt.Total,
-                newReceipt.CurrencyCode,
+                newReceipt.Currency.Code,
             }
         );
     }

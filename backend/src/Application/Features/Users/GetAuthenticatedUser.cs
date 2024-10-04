@@ -1,7 +1,5 @@
-using System.Security.Claims;
 using Application.Endpoints;
 using Application.Services;
-using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 
@@ -31,7 +29,7 @@ public static class GetAuthenticatedUser
     {
         Console.WriteLine("Get authenticated user");
 
-        User? currentUser = userContextService.CurrentUser;
+        CurrentUser? currentUser = userContextService.CurrentUser;
         if (currentUser == null)
         {
             Console.WriteLine("Unauthorized: User is not authenticated");

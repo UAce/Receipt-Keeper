@@ -1,6 +1,6 @@
-namespace Domain.Models;
+namespace Domain.Entities;
 
-public class Currency
+public class CurrencyEntity
 {
     public required string Code { get; set; }
 

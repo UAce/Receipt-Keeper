@@ -81,7 +81,7 @@ public static class DependencyInjectionExtensions
                                 ?.Value;
 
                             Console.WriteLine("Retrieving CurrentUser");
-                            User? currentUser =
+                            CurrentUser? currentUser =
                                 identityId == null
                                     ? null
                                     : await userRepository.GetUserAsync(identityId);

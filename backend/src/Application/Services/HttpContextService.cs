@@ -7,7 +7,7 @@ namespace Application.Services
     {
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-        public User CurrentUser
+        public CurrentUser CurrentUser
         {
             get
             {
@@ -16,7 +16,7 @@ namespace Application.Services
                         "CurrentUser",
                         out var userObj
                     ) != null
-                    && userObj is User user
+                    && userObj is CurrentUser user
                 )
                 {
                     return user;
@@ -34,7 +34,7 @@ namespace Application.Services
                     .HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)
                     ?.Value;
 
-                if (identityId != null && identityId is string)
+                if (identityId != null && identityId is not null)
                 {
                     return identityId;
                 }

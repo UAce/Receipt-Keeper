@@ -1,6 +1,6 @@
-using System.Security.Claims;
 using Application.Endpoints;
 using Application.Services;
+using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Models;
 using FluentValidation;
@@ -60,8 +60,8 @@ public static class RegisterUser
             );
         }
 
-        User registeredUser = await userRepository.RegisterUserAsync(
-            new User
+        CurrentUser registeredUser = await userRepository.RegisterUserAsync(
+            new UserEntity
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,

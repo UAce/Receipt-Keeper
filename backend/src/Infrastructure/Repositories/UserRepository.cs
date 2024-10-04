@@ -1,5 +1,6 @@
 using System.Data;
 using Dapper;
+using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Models;
 
@@ -9,20 +10,20 @@ public class UserRepository(IDbConnection dbConnection)
     : BaseRepository(dbConnection),
         IUserRepository
 {
-    public async Task<User?> GetUserAsync(string identityId)
+    public async Task<CurrentUser?> GetUserAsync(string identityId)
     {
         const string query =
             @"
             SELECT * FROM ""User"" where ""IdentityId"" = @IdentityId
         ";
 
-        return await _dbConnection.QuerySingleOrDefaultAsync<User>(
+        return await _dbConnection.QuerySingleOrDefaultAsync<CurrentUser>(
             query,
             new { IdentityId = identityId }
         );
     }
 
-    public async Task<User> RegisterUserAsync(User user)
+    public async Task<CurrentUser> RegisterUserAsync(UserEntity user)
     {
         const string query =
             @"
@@ -41,7 +42,7 @@ public class UserRepository(IDbConnection dbConnection)
 
         // No need to use using statement. Dapper will automatically
         // open, close and dispose the connection for you.
-        return await _dbConnection.QueryFirstAsync<User>(
+        return await _dbConnection.QueryFirstAsync<CurrentUser>(
             query,
             new
             {

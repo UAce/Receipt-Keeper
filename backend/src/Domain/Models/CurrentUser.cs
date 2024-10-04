@@ -1,7 +1,9 @@
 namespace Domain.Models;
 
-public class User : Base
+public class CurrentUser
 {
+    public required Guid Id { get; set; }
+
     public required string FirstName { get; set; }
 
     public required string LastName { get; set; }
