@@ -14,8 +14,8 @@ public static class StoreReceipt
         decimal Total,
         string CurrencyCode,
         string Note,
-        Guid MerchantId,
-        DateTimeOffset PrintedAt
+        DateTimeOffset PrintedAt,
+        Guid MerchantId
     ) { };
 
     public class StoreReceiptValidator : AbstractValidator<StoreReceiptRequest>
@@ -86,7 +86,7 @@ public static class StoreReceipt
             {
                 newReceipt.Id,
                 newReceipt.Total,
-                newReceipt.Currency.Code,
+                newReceipt.CurrencyCode,
             }
         );
     }
