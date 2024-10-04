@@ -5,7 +5,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Models;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Dapper;
 
 public class ReceiptRepository(IDbConnection dbConnection)
     : BaseRepository(dbConnection),
@@ -15,13 +15,33 @@ public class ReceiptRepository(IDbConnection dbConnection)
     {
         const string query =
             @"
-            SELECT * FROM ""Receipt"" where ""Id"" = @Id
-        ";
+                SELECT * FROM ""Receipt"" r 
+                INNER JOIN ""Merchant"" m ON r.""MerchantId"" = m.""MerchantId"" 
+                WHERE ""Id"" = @Id
+            ";
 
-        return await _dbConnection.QuerySingleOrDefaultAsync<Receipt>(
+        var receiptDictionary = new Dictionary<Guid, Receipt>();
+
+        var result = await _dbConnection.QueryAsync<ReceiptEntity, MerchantEntity, Receipt>(
             query,
-            new { Id = receiptId }
+            (receipt, merchant) =>
+            {
+                return new Receipt
+                {
+                    Id = receipt.Id,
+                    Total = receipt.Total,
+                    Note = receipt.Note,
+                    PrintedAt = receipt.PrintedAt,
+                    UserId = receipt.UserId,
+                    CurrencyCode = receipt.CurrencyCode,
+                    Merchant = new Merchant { Id = merchant.Id, Name = merchant.Name },
+                };
+            },
+            new { Id = receiptId },
+            splitOn: "MerchantId"
         );
+
+        return result.FirstOrDefault();
     }
 
     public Task<List<ReceiptListItem>> ListReceiptsAsync(ListReceiptsFilter filter)

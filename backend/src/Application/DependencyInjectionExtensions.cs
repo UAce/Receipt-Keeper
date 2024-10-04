@@ -6,7 +6,7 @@ using Application.Endpoints;
 using Domain.Interfaces;
 using Domain.Models;
 using FluentValidation;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;

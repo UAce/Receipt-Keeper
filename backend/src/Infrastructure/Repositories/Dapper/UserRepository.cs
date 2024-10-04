@@ -4,7 +4,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Models;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Dapper;
 
 public class UserRepository(IDbConnection dbConnection)
     : BaseRepository(dbConnection),
