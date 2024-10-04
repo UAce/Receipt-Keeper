@@ -1,5 +1,7 @@
 namespace Domain.Models;
 
+public record ListReceiptsRequest { }
+
 public class Receipt : Base
 {
     // This maps to Numeric in PostgreSQL

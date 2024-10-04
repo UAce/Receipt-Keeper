@@ -60,7 +60,7 @@ public static class RegisterUser
             );
         }
 
-        User registeredUser = await userRepository.RegisterAsync(
+        User registeredUser = await userRepository.RegisterUserAsync(
             new User
             {
                 FirstName = request.FirstName,
