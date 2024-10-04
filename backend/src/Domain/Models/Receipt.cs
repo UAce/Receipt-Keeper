@@ -9,6 +9,8 @@ public class Receipt : Base
 
     public string Note { get; set; } = string.Empty;
 
+    public required DateTimeOffset PrintedAt { get; set; }
+
     // Relationship
 
     public required string CurrencyCode { get; set; }

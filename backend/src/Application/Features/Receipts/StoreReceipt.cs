@@ -13,7 +13,8 @@ public static class StoreReceipt
         decimal Total,
         string CurrencyCode,
         string Note,
-        Guid MerchantId
+        Guid MerchantId,
+        DateTimeOffset PrintedAt
     ) { };
 
     public class StoreReceiptValidator : AbstractValidator<StoreReceiptRequest>
@@ -31,6 +32,9 @@ public static class StoreReceipt
                 .MaximumLength(255)
                 .WithMessage("Note cannot exceed 255 characters.");
             RuleFor(x => x.MerchantId).NotEmpty().NotNull().WithMessage("Merchant ID is required.");
+            RuleFor(x => x.PrintedAt)
+                .NotEmpty()
+                .WithMessage("PrintedAt must be a valid DateTimeOffset.");
         }
     }
 
@@ -69,6 +73,7 @@ public static class StoreReceipt
             {
                 Total = request.Total,
                 Note = request.Note,
+                PrintedAt = request.PrintedAt,
                 CurrencyCode = request.CurrencyCode,
                 MerchantId = request.MerchantId,
                 UserId = httpContextService.CurrentUser.Id,
