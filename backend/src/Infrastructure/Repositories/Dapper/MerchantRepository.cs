@@ -1,5 +1,6 @@
 using System.Data;
 using Dapper;
+using Domain.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Models;
@@ -29,5 +30,26 @@ public class MerchantRepository(IDbConnection dbConnection)
             query,
             new { merchant.Name, merchant.UserId }
         );
+    }
+
+    public async Task<List<Merchant>> ListMerchantsAsync(ListMerchantsFilter filter)
+    {
+        const string query =
+            @"
+                SELECT
+                    *
+                FROM
+                    ""Merchant"" m
+                WHERE
+                    m.""UserId"" = @UserId AND (@Search IS NULL OR m.""Name"" ILIKE @Search )
+                ;
+            ";
+
+        var results = await _dbConnection.QueryAsync<Merchant>(
+            query,
+            new { filter.UserId, Search = $"{filter.Search}%" }
+        );
+
+        return results.ToList();
     }
 }

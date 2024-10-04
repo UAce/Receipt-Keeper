@@ -53,8 +53,10 @@ public class ReceiptRepository(IDbConnection dbConnection)
                 INNER JOIN
                     ""Merchant"" m ON r.""MerchantId"" = m.""Id""
                 WHERE
+                    r.""UserId"" = @UserId AND
                     (@FromDate IS NULL OR r.""PrintedAt"" >= @FromDate) AND
-                    (@ToDate IS NULL OR r.""PrintedAt"" < @ToDate) -- Exclusive To
+                    -- Exclusive To
+                    (@ToDate IS NULL OR r.""PrintedAt"" < @ToDate)
                 ORDER BY 
                     r.""PrintedAt""
                 OFFSET @Offset ROWS
@@ -77,6 +79,7 @@ public class ReceiptRepository(IDbConnection dbConnection)
             },
             new
             {
+                filter.UserId,
                 FromDate = filter.DateTimeRange?.From,
                 ToDate = filter.DateTimeRange?.To,
                 Offset = (filter.Pagination.PageNumber - 1) * filter.Pagination.PageSize,
