@@ -21,7 +21,7 @@ public class MerchantRepository(IDbConnection dbConnection)
                 (
                     gen_random_uuid(), 
                     @Name, 
-                    @UserId,
+                    @UserId
                 ) RETURNING *
         ";
 

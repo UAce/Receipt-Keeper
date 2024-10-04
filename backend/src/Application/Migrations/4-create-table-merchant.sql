@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS "Merchant" (
   "DeletedAt" TIMESTAMP WITH TIME ZONE,
   -- Constraints
   CONSTRAINT "merchant_id_pkey" PRIMARY KEY ("Id"),
-  CONSTRAINT "merchant_user_id_fkey" FOREIGN KEY ("UserId") REFERENCES "User" ("Id") ON DELETE CASCADE -- Delete merchant if User is deleted
+  CONSTRAINT "merchant_user_id_fkey" FOREIGN KEY ("UserId") REFERENCES "User" ("Id") ON DELETE CASCADE, -- Delete merchant if User is deleted
+  CONSTRAINT "merchant_name_user_id_unique_key" UNIQUE ("Name", "UserId")
 );
 
 -- We create an index to speed up queries that search by Id
