@@ -32,7 +32,7 @@ public static class RegisterUser
     {
         public void MapRoute(IEndpointRouteBuilder app)
         {
-            app.MapPost("/register", Handler)
+            app.MapPost("/", Handler)
                 .WithName("RegisterUser")
                 .Produces<RegisterUserResponse>(201)
                 .ProducesValidationProblem();
