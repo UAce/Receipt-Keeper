@@ -5,6 +5,6 @@ namespace Domain.DTOs
     public record ListReceiptsFilter(
         Guid UserId,
         Pagination Pagination,
-        DateTimeRange DateTimeRange
+        DateTimeRange? DateTimeRange
     ) { };
 }
