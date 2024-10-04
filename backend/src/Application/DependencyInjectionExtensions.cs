@@ -120,6 +120,7 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IReceiptRepository, ReceiptRepository>();
 
         return services;
     }
